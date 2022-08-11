@@ -1,7 +1,8 @@
 version: "3.7"
 
 services:
-  dapr_placement:
+  dapr_placement_dc:
+    container_name: dapr_placement_dc
     image: "daprio/dapr"
     command: [ "./placement", "--port", "50006" ]
     ports:
@@ -9,16 +10,16 @@ services:
     networks:
       - hello-dapr
 
-  dapr_zipkin:
-    container_name: dapr_zipkin
+  dapr_zipkin_dc:
+    container_name: dapr_zipkin_dc
     image: "openzipkin/zipkin:latest"
     ports:
       - "9411:9411"
     networks:
       - hello-dapr
 
-  dapr_consul:
-    container_name: dapr_consul
+  dapr_consul_dc:
+    container_name: dapr_consul_dc
     image: hashicorp/consul:latest
     ports:
       - "8500:8500"
@@ -34,9 +35,9 @@ services:
     ports:
       - "3001:3001"
     depends_on:
-      - dapr_placement
-      - dapr_consul
-      - dapr_zipkin
+      - dapr_placement_dc
+      - dapr_consul_dc
+      - dapr_zipkin_dc
     networks:
       - hello-dapr
 
@@ -55,9 +56,9 @@ services:
       - "./dapr-config/:/dapr-config"
     depends_on:
       - greeting_service
-      - dapr_placement
-      - dapr_consul
-      - dapr_zipkin
+      - dapr_placement_dc
+      - dapr_consul_dc
+      - dapr_zipkin_dc
     network_mode: "service:greeting_service"
 
   ##### Gateway service & DAPR Sidecar #####
@@ -69,9 +70,9 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - dapr_placement
-      - dapr_consul
-      - dapr_zipkin
+      - dapr_placement_dc
+      - dapr_consul_dc
+      - dapr_zipkin_dc
     networks:
       - hello-dapr
 
@@ -90,8 +91,9 @@ services:
       - "./dapr-config/:/dapr-config"
     depends_on:
       - gateway_service
-      - dapr_consul
-      - dapr_zipkin
+      - dapr_placement_dc
+      - dapr_consul_dc
+      - dapr_zipkin_dc
     network_mode: "service:gateway_service"
 
 networks:
